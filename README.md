@@ -29,16 +29,39 @@ This works as Deep Fool is not a **"Targeted Adversarial Generator"** method.\
 ## Fast Gradient Sign Method 
 
 ## Intution
-- A simple linear model can be described as transpose(W) * x, where W is the weight matrix and x is the input. 
+- A simple linear model can be described as (W)T * x, where W is the weight matrix and x is the input. 
 - The input is made up of many features, and the precision of any given particular feature is limited.
-- Now let’s add a small noise η, such that η < ϵ (ϵ is smaller than the precision of the features) to every feature of x. We can call this new input x̄. So,
+- Now let’s add a small noise η, such that η < ϵ (ϵ is smaller than the precision of the features) to every feature of x. We can call this new input x̄. 
 ```
 x̄ = x + η
 ```
-We can write the dot product between the weight matrix and x̄ as
+We can write the dot product between the weight matrix W and x̄ as
 ```
-transpose(W) * x̄ = transpose(W) * x + transpose(W) * η
+(W)T * x̄ = (W)T * x + (W)T * η
 ```
-- This means that the activation of the network increases by transpose(W) * η. The increase in activation can be maximised by assigning η = sign(W).
-
+- This means that the activation of the network increases by (W)T * η. 
 - Such small changes in activation can grow linearly with the increase in dimensions. Hence, for high-dimensional problems, we can make small changes to the input that can add up to one big change to the output. Thus, even a smaller model is vulnerable to adversarial examples, provided the input is high dimensional.
+### Fast Gradient Sign Method 
+The idea behind FGSM is surprisingly simple: we do opposite of the typical gradient descent in order to maximize the loss, since confusing the model is the end goal of adversarial attack.
+Therefore, we consider x, the model’s input, to be a trainable parameter. Then, we add the gradient to its original input variable to create a perturbation. Mathematically, this can be expressed as follows:
+η=ϵ⋅sign(∇xJ(w,x,y))
+where J represents the cost function. 
+Then, we can create an adversarial example via
+x~=x+ϵ⋅sign(∇xJ(w,x,y))
+
+This is the crux of the fast gradient sign method: we use the sign of the gradient, multiply it by some small value, and add that perturbation to the original input to create an adversarial example.
+
+One way to look at this is in terms of first-order approximation. Recall that
+f(x~)≃f(x)+(x~−x)⊤∇xf(x)
+
+In this context, we can consider f
+to be the cost function J
+
+, which then turns into
+J(w,x~)=J(x,w)+(x~−x)⊤∇xJ(w,x)
+
+Then, the goal of an adversarial attack is to maximize the second term in the addition. Since there is an infinity norm constraint on the perturbation, namely
+∥x~−x∥∞≤ϵ
+
+with some thinking we can convince ourselves that the perturbed example that maximizes the loss function is given by
+x~=x+ϵ⋅sign(∇xJ(w,x,y))
