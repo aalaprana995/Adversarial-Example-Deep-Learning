@@ -28,3 +28,17 @@ This works as Deep Fool is not a **"Targeted Adversarial Generator"** method.\
 
 ## Fast Gradient Sign Method 
 
+## Intution
+- A simple linear model can be described as transpose(W) * x, where W is the weight matrix and x is the input. 
+- The input is made up of many features, and the precision of any given particular feature is limited.
+- Now let’s add a small noise η, such that η < ϵ (ϵ is smaller than the precision of the features) to every feature of x. We can call this new input x̄. So,
+```
+x̄ = x + η
+```
+We can write the dot product between the weight matrix and x̄ as
+```
+transpose(W) * x̄ = transpose(W) * x + transpose(W) * η
+```
+- This means that the activation of the network increases by transpose(W) * η. The increase in activation can be maximised by assigning η = sign(W).
+
+- Such small changes in activation can grow linearly with the increase in dimensions. Hence, for high-dimensional problems, we can make small changes to the input that can add up to one big change to the output. Thus, even a smaller model is vulnerable to adversarial examples, provided the input is high dimensional.
